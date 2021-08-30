@@ -8,7 +8,7 @@ import { NgxSehirHaritasiService } from './ngx-sehir-haritasi.service';
   template: `
     <iframe
       id="ngx-sehir-haritas-map-frame"
-      src="http://sehirharitasi.ibb.gov.tr"
+      [src]="frameSrc"
       style="height:100%; width:100%;"
     ></iframe>
   `,
@@ -25,10 +25,15 @@ import { NgxSehirHaritasiService } from './ngx-sehir-haritasi.service';
 })
 export class NgxSehirHaritasiComponent implements AfterViewInit {
   @Input() apiKey!: string;
+  @Input() https: boolean = true;
 
   private map!: SehirHaritasiAPI;
 
   constructor(private service: NgxSehirHaritasiService) {}
+
+  get frameSrc(): string {
+    return this.https ? 'https' : 'http' + '://sehirharitasi.ibb.gov.tr';
+  }
 
   ngAfterViewInit(): void {
     if (!this.apiKey) {
