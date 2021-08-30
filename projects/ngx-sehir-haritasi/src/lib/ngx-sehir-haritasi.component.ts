@@ -8,7 +8,7 @@ import { NgxSehirHaritasiService } from './ngx-sehir-haritasi.service';
   template: `
     <iframe
       id="ngx-sehir-haritas-map-frame"
-      [src]="frameSrc"
+      [src]="frameSrc | safe"
       style="height:100%; width:100%;"
     ></iframe>
   `,
@@ -32,7 +32,7 @@ export class NgxSehirHaritasiComponent implements AfterViewInit {
   constructor(private service: NgxSehirHaritasiService) {}
 
   get frameSrc(): string {
-    return this.https ? 'https' : 'http' + '://sehirharitasi.ibb.gov.tr';
+    return (this.https ? 'https' : 'http') + '://sehirharitasi.ibb.gov.tr';
   }
 
   ngAfterViewInit(): void {

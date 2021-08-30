@@ -1,27 +1,37 @@
 # NgxSehirHaritasi
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.0.2.
+> Demo: https://koraykural.github.io/ngx-sehir-haritasi/
 
-## Development server
+## Geliştirme Süreci
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Uygulama Angular v12 ve Şehir Haritası API kullanılarak geliştirilmiştir.
 
-## Code scaffolding
+### Şehir Haritası API
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Şehir Haritası API non-module js olduğu için Angular ile kullanımı oldukça zordur. Bu yüzden projeyi ikiye bölüp yeniden kullanılabilir bir harita kütüphanesi oluşturdum ve bu kütüphaneyi kullanarak uygulamanın kendisini geliştirdim.
 
-## Build
+Yeniden kullanılabilir bir kütüphane (ngx-sehir-haritasi) oluşturmak için kaynak kodu `http://sehirharitasi.ibb.gov.tr/api/map2.js` adresinden indirip doğrudan proje dosyaları arasına koydum. Angular Typescript kullandığı için `map2.js` dosyasını typescript dosyasına dönüştürüp ortaya çıkan derleyici hatalarını ortadan kaldırdım. Bu aşamada IE desteğini kaldırdım ve dökümentasyona bakarak parametre ve dönüş değerleri için doğru tipleri atadım.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+### ~~Callback~~ -> Observables
 
-## Running unit tests
+Şehir Haritası API asenkron operasyonlar için callback stilini kullanıyor ancak bu Angular için pek popüler değil. Angular asenkron işlemler için [Rxjs](https://rxjs.dev/) kütüphanesini kullanıyor. Bu yüzden map2.js kaynak kodunu kütüphanenin kullanıcılarından gizledim ve ngx-sehir-haritasi'na, bu metodlara erişimi sağlayacak servisler ekledim.
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+> Not: Bu işlem zaman aldığı için şimdilik sadece demo-app'te ihtiyacım olan fonksiyonlar için wrapper yazdım.
 
-## Running end-to-end tests
+### Demo App
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+Hackathon için kullanılacak asıl uygulama /projects/demo-app klasöründe bulunuyor.
 
-## Further help
+Uygulama tam ekran bir haritaya ve gerekli işlemleri yapmak için 3 farklı kaplamaya sahip.
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+1. kaplama bir yükleme göstergesi. Iframe elementinin yüklenmesi zaman aldığı için bu aşamada kullanıcının harita ile etkileşimini engellemek için bir yükleme göstergesi koydum. Uygulama ilk açıldıktan birkaç saniye sonra bu kaplama otomatik olarak kayboluyor.
+
+2. kaplama kullanıcıdan konumunu seçmesini siteyen bir butona sahip. Kullanıcı haritayı kaydırıp butona bastıktan sonra ekran haritanın bu bölgesine kilitleniyor ve 3. kaplamaya geçiş yapılıyor.
+
+3. kaplama mesafe butonlarına (15, 30, 60), arama kategorilerine (park, hastane vb.) ve kullanıcının konumunu değiştirmesine olanak sağlayan bir butona sahip. 3. kaplama gelir gelmez otomatik olarak 15 dakika mesafedeki Akaryakıt istanyonları aranıyor. Arama sonuçları haritaya mavi noktalar olarak ekleniyor. Herhangi bir noktaya tıklandığında haritanın güzergah analizi fonksiyonu kullanılarak rota oluşturuluyor.
+
+### Veriler
+
+Bütün veriler `data.ibb.gov.tr` adresinden indirildi ve demo uygulamasının kaynak kodlarına json formatında eklendi. Farklı bir kategoride arama yapıldığında o kategorinin konumları bit HTTP isteği ile alınıp, kullanıcı tarafında filtrelenip haritaya ekleniyor.
+
+Verilerin alınmasından sorumlu bir servis oluşturdum (`data.service`). Bütün konumların kullanıcı tarafına aktarılıp orada filtrelenmesi çok verimli olmadığı için bu sitemin ileride değiştirilmesini kolaylaştırdım bu şekilde.
