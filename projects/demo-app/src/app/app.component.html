@@ -1,0 +1,12 @@
+<ngx-sehir-haritasi
+  apiKey="21825cb756434df0aba40b7883417e21"
+></ngx-sehir-haritasi>
+<ng-container *ngIf="showSetUserLocation | async">
+  <app-set-location></app-set-location>
+</ng-container>
+<ng-container *ngIf="showSetDistance | async">
+  <app-search></app-search>
+</ng-container>
+<ng-container *ngIf="showSpinner | async">
+  <app-spinner></app-spinner>
+</ng-container>
