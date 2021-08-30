@@ -51,7 +51,7 @@ export class AppService {
           this.routeAnalysis.close();
         }),
 
-        // Attach search results if all three inputs are set
+        // Mark search results if all three inputs are set
         mergeMap(({ location, distance, category }) =>
           forkJoin({
             location: of(location),
@@ -72,26 +72,21 @@ export class AppService {
         }
       });
 
-    combineLatest([
-      this.userLocation.pipe(
-        // Don't let continue if map is not ready
-        withLatestFrom(this.ngxSehirHaritasiService.mapReady),
-        filter(([_, mapReady]) => mapReady),
-        map(([location, _]) => location),
-
-        // Close previous route analysis
-        tap(() => this.routeAnalysis.close()),
-
-        filter((location) => location !== undefined),
-        map((l) => l as Location)
-      ),
-      this.markerService.onClick().pipe(
+    // Observer marker clicks, create route
+    this.markerService
+      .onClick()
+      .pipe(
+        // Continue if marker is set for a search result
         map((tag) => this.parseMarkerTag(tag)),
         filter((marker) => marker !== undefined),
-        map((m) => m as SearchResultItem)
-      ),
-    ])
-      .pipe(map(([location, marker]) => ({ location, marker })))
+        map((m) => m as SearchResultItem),
+
+        // Continue if user location is set
+        withLatestFrom(this.userLocation),
+        map(([m, l]) => ({ marker: m, location: l as Location })),
+        tap(() => this.routeAnalysis.close()),
+        filter(({ location }) => location !== undefined)
+      )
       .subscribe(({ location, marker }) => {
         this.routeAnalysis.drive({
           start: location,
